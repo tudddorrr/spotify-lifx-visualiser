@@ -1,0 +1,16 @@
+html
+  head
+    title= 'LIFX Visualiser'
+    link(rel='stylesheet', href='/style.css')
+  body
+    div(id='container')
+      h1= 'Hey ' + user.display_name.split(" ")[0]
+
+      div(class='media')
+        img(src=user.images[0].url)
+
+      h3= 'Your Spotify account is now connected!'
+      h4= 'Just waiting on your LIFX device...'
+
+      img(src='/loading.apng' height=32)
+      
