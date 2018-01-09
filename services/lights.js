@@ -9,7 +9,8 @@ var light;
 var user;
 var audioAnalysis;
 
-var loudness = -99;
+var loudest = -99;
+var quietest = 99;
 var lastBrightness = 0;
 var colour = 0;
 
@@ -33,7 +34,8 @@ module.exports.initBeat = function(analysis, user) {
   light.user = user;
 
   for(var i=0; i<audioAnalysis.segments.length; i++) {
-    if(audioAnalysis.segments[i].loudness_max>loudness) loudness = audioAnalysis.segments[i].loudness_max;
+    if(audioAnalysis.segments[i].loudness_max>loudest) loudest = audioAnalysis.segments[i].loudness_max;
+    if(audioAnalysis.segments[i].loudness_max<quietest) quietest = audioAnalysis.segments[i].loudness_max;
   }
   queryCurrentTrack();
 }
@@ -44,9 +46,11 @@ function handleBeat() {
   var brightness = getBrightness();
 
   const brightnessDiff = Math.abs(brightness-lastBrightness);
-  if(brightnessDiff>=30) colour+=_.random(30, 60);
+  if(brightnessDiff>=30) {
+    lastBrightness = brightness;    
+    colour+=_.random(30, 60);
+  }
   light.color(colour%360, 100, brightness, 9000, 200);  
-  lastBrightness = brightness;
 
   beatNum++;
   if(beatNum<audioAnalysis.segments.length) beatTimer.setTimeout(() => handleBeat(), '', audioAnalysis.segments[beatNum].duration + 's');
@@ -81,6 +85,11 @@ function getSection() {
 }
 
 function getBrightness() {
-  const brightness = audioAnalysis.segments[beatNum].loudness_max/audioAnalysis.sections[getSection()].loudness;
-  return 100 - _.clamp(Math.round(brightness*100), 0, 100);
+  const beatLoudness = audioAnalysis.segments[beatNum].loudness_max;
+  const trackLoudness = audioAnalysis.sections[getSection()].loudness;
+
+  const brightness = beatLoudness / trackLoudness;
+  console.log(beatLoudness + ", " + trackLoudness + ", " + brightness);
+
+  return 100 - _.clamp(brightness*100, 0, 100);
 }
