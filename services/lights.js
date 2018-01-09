@@ -90,7 +90,7 @@ function getBrightness() {
   const maxLoudnessDiff = (loudest-quietest);
 
   const brightness = (beatLoudness / trackLoudness) * (maxLoudnessDiff/100);
-  console.log(beatLoudness + ", " + trackLoudness + ", " + maxLoudnessDiff + ", " + brightness);
+  // console.log(beatLoudness + ", " + trackLoudness + ", " + maxLoudnessDiff + ", " + brightness);
 
   return 100 - _.clamp(brightness*100, 0, 100);
 }
