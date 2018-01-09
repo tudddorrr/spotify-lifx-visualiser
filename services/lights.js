@@ -41,16 +41,16 @@ module.exports.initBeat = function(analysis, user) {
 }
 
 function handleBeat() {
-  if(!audioAnalysis.segments || beatNum>=audioAnalysis.segments.length) return;
+  if(beatNum>=audioAnalysis.segments.length) return;
 
   var brightness = getBrightness();
 
   const brightnessDiff = Math.abs(brightness-lastBrightness);
   if(brightnessDiff>=30) {
     lastBrightness = brightness;    
-    colour+=_.random(30, 60);
+    colour+=30;
+    if(audioAnalysis.segments) light.color(colour%360, 100, brightness, 9000, 150);      
   }
-  light.color(colour%360, 100, brightness, 9000, 200);  
 
   beatNum++;
   if(beatNum<audioAnalysis.segments.length) beatTimer.setTimeout(() => handleBeat(), '', audioAnalysis.segments[beatNum].duration + 's');
@@ -87,9 +87,10 @@ function getSection() {
 function getBrightness() {
   const beatLoudness = audioAnalysis.segments[beatNum].loudness_max;
   const trackLoudness = audioAnalysis.sections[getSection()].loudness;
+  const maxLoudnessDiff = (loudest-quietest);
 
-  const brightness = beatLoudness / trackLoudness;
-  console.log(beatLoudness + ", " + trackLoudness + ", " + brightness);
+  const brightness = (beatLoudness / trackLoudness) * (maxLoudnessDiff/100);
+  console.log(beatLoudness + ", " + trackLoudness + ", " + maxLoudnessDiff + ", " + brightness);
 
   return 100 - _.clamp(brightness*100, 0, 100);
 }

@@ -163,6 +163,7 @@ app.get('/error', function(req, res) {
   });
 });
 
-console.log('Listening on 8888');
-app.listen(8888);
-// opn('http://localhost:8888');
+const port = process.env.PORT;
+console.log('Listening on ' + port);
+app.listen(port);
+opn('http://localhost:' + port);
