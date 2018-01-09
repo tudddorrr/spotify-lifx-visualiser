@@ -13,24 +13,26 @@ module.exports.getCurrentTrack = function(user, callback) {
   let self = this;
   request.get(options, function(error, response, body) {
     if(error || !body || !body.item) {
-      // res.redirect('/error?' +
-      // querystring.stringify({
-      //   error: error
-      // }));
+      callback()
       return;
     }
 
     if(track!==body.item.id) {
       console.log('New track: ' + body.item.name + ' by ' + body.item.artists[0].name);
       track = body.item.id;
-      self.getAudioAnalysis(body, user);
+      self.getAudioAnalysis(null, body, user);
     } else {
-      if(callback) callback(body, user);      
+      if(callback) callback(null, body, user);      
     }
   });
 }
 
-module.exports.getAudioAnalysis = function(body, user) {
+module.exports.getAudioAnalysis = function(err, body, user) {
+  if(err) {
+    console.log(err);
+    return;
+  }
+
   const options = {
     url: 'https://api.spotify.com/v1/audio-analysis/' + body.item.id,
     headers: { 'Authorization': 'Bearer ' + user.access_token },

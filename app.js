@@ -121,7 +121,6 @@ app.get('/refresh_token', function(req, res) {
 });
 
 app.get('/user', function(req, res) {
-  // console.log(user);
   if(!user) {
     res.redirect('/');
     return;

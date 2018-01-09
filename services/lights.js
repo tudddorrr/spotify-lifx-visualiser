@@ -19,6 +19,11 @@ client.on('light-new', function(device) {
   light = device;
 });
 
+client.on('light-offline', function(device) {
+  console.log("Light disconnected!");  
+  beatTimer.clearTimeout();
+});
+
 client.init();
 
 module.exports.getLight = function() {
@@ -57,8 +62,13 @@ function handleBeat() {
 }
 
 function queryCurrentTrack() {
-  spotifyService.getCurrentTrack(light.user, function(body) {
-    updateBeatNum(body.progress_ms/1000);
+  spotifyService.getCurrentTrack(light.user, function(err, body) {
+    if(err) {
+      console.log(err);
+    } else {
+      updateBeatNum(body.progress_ms/1000);      
+    }
+
     setTimeout(() => queryCurrentTrack(), MUSIC_POLL_TIME);
   });
 }
@@ -90,7 +100,6 @@ function getBrightness() {
   const maxLoudnessDiff = (loudest-quietest);
 
   const brightness = (beatLoudness / trackLoudness) * (maxLoudnessDiff/100);
-  // console.log(beatLoudness + ", " + trackLoudness + ", " + maxLoudnessDiff + ", " + brightness);
 
   return 100 - _.clamp(brightness*100, 0, 100);
 }
