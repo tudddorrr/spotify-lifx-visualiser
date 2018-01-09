@@ -1,6 +1,7 @@
 const LifxClient = require('node-lifx').Client;
 const _ = require('lodash');
 const spotifyService = require('./spotify');
+const NanoTimer = require('nanotimer');
 const MUSIC_POLL_TIME = 3000;
 
 var client = new LifxClient();
@@ -8,8 +9,8 @@ var light;
 var user;
 var audioAnalysis;
 
-var loudness = -999;
-var lastBrightness = -999;
+var loudness = -99;
+var lastBrightness = 0;
 var colour = 0;
 
 client.on('light-new', function(device) {
@@ -24,8 +25,10 @@ module.exports.getLight = function() {
 }
 
 var beatNum = 0;
-var currBeatTimeout;
+var beatTimer;
 module.exports.initBeat = function(analysis, user) {
+  beatTimer = new NanoTimer();
+
   audioAnalysis = analysis;
   light.user = user;
 
@@ -46,7 +49,7 @@ function handleBeat() {
   lastBrightness = brightness;
 
   beatNum++;
-  if(beatNum<audioAnalysis.segments.length) currBeatTimeout = setTimeout(() => handleBeat(), audioAnalysis.segments[beatNum].duration*1000);
+  if(beatNum<audioAnalysis.segments.length) beatTimer.setTimeout(() => handleBeat(), '', audioAnalysis.segments[beatNum].duration + 's');
 }
 
 function queryCurrentTrack() {
@@ -64,7 +67,7 @@ function updateBeatNum(progress) {
     if(_.inRange(progress, start, end)) beatNum = i;
   }
 
-  clearTimeout(currBeatTimeout);
+  beatTimer.clearTimeout();
   handleBeat();
 }
 
@@ -78,6 +81,6 @@ function getSection() {
 }
 
 function getBrightness() {
-  const brightness = Math.abs(audioAnalysis.segments[beatNum].loudness_max)/Math.abs(audioAnalysis.sections[getSection()].loudness);
-  return 100 - _.clamp(Math.round(brightness*100), 10, 100);
+  const brightness = audioAnalysis.segments[beatNum].loudness_max/audioAnalysis.sections[getSection()].loudness;
+  return 100 - _.clamp(Math.round(brightness*100), 0, 100);
 }
