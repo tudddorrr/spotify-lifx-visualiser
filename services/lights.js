@@ -3,6 +3,7 @@ const _ = require('lodash');
 const spotifyService = require('./spotify');
 const NanoTimer = require('nanotimer');
 const MUSIC_POLL_TIME = 3000;
+const BEAT_MODE = 1; // 0 = based on section volume, 1 = based on previous beat volume
 
 var client = new LifxClient();
 var light;
@@ -95,6 +96,11 @@ function getSection() {
 }
 
 function getBrightness() {
+  return BEAT_MODE==0 ? getBrightnessSectionLoudness() : getBrightnessPrevBeat();
+}
+
+function getBrightnessSectionLoudness() {
+  // set brightness based on this beat's volume in relation to the loudness of the section it's in
   const beatLoudness = audioAnalysis.segments[beatNum].loudness_max;
   const trackLoudness = audioAnalysis.sections[getSection()].loudness;
   const maxLoudnessDiff = (loudest-quietest);
@@ -102,4 +108,15 @@ function getBrightness() {
   const brightness = (beatLoudness / trackLoudness) * (maxLoudnessDiff/100);
 
   return 100 - _.clamp(brightness*100, 0, 100);
+}
+
+function getBrightnessPrevBeat() {
+  // set brightness based on the % difference between the current and previous beats' volumes
+  if(beatNum==0) return 100;
+
+  const prevBeatLoudness = audioAnalysis.segments[beatNum-1].loudness_max;
+  const currBeatLoudness = audioAnalysis.segments[beatNum].loudness_max;
+
+  const brightness = Math.round(Math.abs((currBeatLoudness/prevBeatLoudness)*100));
+  return _.clamp(brightness, 0, 100);
 }
