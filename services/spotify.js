@@ -18,7 +18,7 @@ module.exports.getCurrentTrack = function(user, callback) {
     }
 
     if(track!==body.item.id) {
-      console.log('New track: ' + body.item.name + ' by ' + body.item.artists[0].name);
+      console.log("New track: " + body.item.name + " by " + body.item.artists[0].name);
       track = body.item.id;
       self.getAudioAnalysis(null, body, user);
     } else {

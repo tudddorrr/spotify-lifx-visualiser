@@ -2,8 +2,10 @@ const LifxClient = require('node-lifx').Client;
 const _ = require('lodash');
 const spotifyService = require('./spotify');
 const NanoTimer = require('nanotimer');
-const MUSIC_POLL_TIME = 3000;
-const BEAT_MODE = 1; // 0 = based on section volume, 1 = based on previous beat volume
+
+const MUSIC_POLL_TIME = 2000;
+// 0 = based on section volume, 1 = based on previous beat volume
+const BEAT_MODE = 1;
 
 var client = new LifxClient();
 var light;
@@ -14,6 +16,7 @@ var loudest = -99;
 var quietest = 99;
 var lastBrightness = 0;
 var colour = 0;
+var paused = false;
 
 client.on('light-new', function(device) {
   console.log("Light connected!");
@@ -47,7 +50,7 @@ module.exports.initBeat = function(analysis, user) {
 }
 
 function handleBeat() {
-  if(beatNum>=audioAnalysis.segments.length) return;
+  if(beatNum>=audioAnalysis.segments.length || paused) return;
 
   var brightness = getBrightness();
 
@@ -55,7 +58,7 @@ function handleBeat() {
   if(brightnessDiff>=30) {
     lastBrightness = brightness;    
     colour+=30;
-    if(audioAnalysis.segments) light.color(colour%360, 100, brightness, 9000, 150);      
+    light.color(colour%360, 100, brightness, 9000, 150);      
   }
 
   beatNum++;
@@ -67,7 +70,12 @@ function queryCurrentTrack() {
     if(err) {
       console.log(err);
     } else {
-      updateBeatNum(body.progress_ms/1000);      
+      if(!body.progress_ms) {
+        console.log("Couldn't get current track");
+      } else {
+        updateBeatNum(body.progress_ms/1000);       
+        paused = !body.is_playing;  
+      }
     }
 
     setTimeout(() => queryCurrentTrack(), MUSIC_POLL_TIME);
