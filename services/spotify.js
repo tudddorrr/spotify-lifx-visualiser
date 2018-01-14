@@ -13,7 +13,7 @@ module.exports.getCurrentTrack = function(user, callback) {
   let self = this;
   request.get(options, function(error, response, body) {
     if(error || !body || !body.item) {
-      callback()
+      if(callback) callback(err);
       return;
     }
 
