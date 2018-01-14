@@ -11,9 +11,9 @@ module.exports.getCurrentTrack = function(user, callback) {
   };
 
   let self = this;
-  request.get(options, function(error, response, body) {
-    if(error || !body || !body.item) {
-      if(callback) callback(err);
+  request.get(options, function(err, response, body) {
+    if(err || !body || !body.item) {
+      if(callback) callback(err || "Couldn't get current track");
       return;
     }
 
@@ -39,7 +39,7 @@ module.exports.getAudioAnalysis = function(err, body, user) {
     json: true
   };
 
-  request.get(options, function(error, response, body) {
+  request.get(options, function(err, response, body) {
     lightService.initBeat(body, user);
   });
 }
