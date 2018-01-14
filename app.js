@@ -162,7 +162,7 @@ app.get('/error', function(req, res) {
   });
 });
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8888;
 console.log('Listening on ' + port);
 app.listen(port);
 opn('http://localhost:' + port);
