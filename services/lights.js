@@ -6,6 +6,8 @@ const NanoTimer = require('nanotimer');
 const MUSIC_POLL_TIME = 2000;
 // 0 = based on section volume, 1 = based on previous beat volume
 const BEAT_MODE = 1;
+// 0 = scroll through colour wheel, 1 = based on album's artwork
+const COLOUR_MODE = 0;
 
 var client = new LifxClient();
 var light;
@@ -15,7 +17,6 @@ var audioAnalysis;
 var loudest = -99;
 var quietest = 99;
 var lastBrightness = 0;
-var colour = 0;
 var paused = false;
 
 client.on('light-new', function(device) {
@@ -49,6 +50,21 @@ module.exports.initBeat = function(analysis, user) {
   queryCurrentTrack();
 }
 
+var albumColours = [];
+var curColour = 0;
+module.exports.setAlbumColours = function(colours) {
+  albumColours = colours;
+  curColour = randColourIndex();
+}
+
+function randColourIndex() {
+  var rand = _.random(0, albumColours.length-1);
+  while(rand===curColour) {
+    rand = _.random(0, albumColours.length-1);
+  }
+  return rand;
+}
+
 function handleBeat() {
   if(beatNum>=audioAnalysis.segments.length || paused) return;
 
@@ -56,13 +72,29 @@ function handleBeat() {
 
   const brightnessDiff = Math.abs(brightness-lastBrightness);
   if(brightnessDiff>=30) {
-    lastBrightness = brightness;    
-    colour+=30;
-    light.color(colour%360, 100, brightness, 9000, 150);      
+    lastBrightness = brightness; 
+
+    if(COLOUR_MODE===1) {
+      setColourFromAlbum(brightness)
+    } else {
+      setColourFromWheel(brightness);  
+    }  
   }
 
   beatNum++;
   if(beatNum<audioAnalysis.segments.length) beatTimer.setTimeout(() => handleBeat(), '', audioAnalysis.segments[beatNum].duration + 's');
+}
+
+function setColourFromWheel(brightness) {
+  curColour+=30;
+  light.color(curColour%360, 100, brightness, 9000, 150);    
+}
+
+function setColourFromAlbum(brightness) {
+  curColour = randColourIndex();
+  const col = albumColours[curColour];
+
+  light.color(col[0], col[1], brightness, 9000, 150);   
 }
 
 function queryCurrentTrack() {
@@ -123,8 +155,8 @@ function getBrightnessPrevBeat() {
   if(beatNum==0) return 100;
 
   const prevBeatLoudness = audioAnalysis.segments[beatNum-1].loudness_max;
-  const currBeatLoudness = audioAnalysis.segments[beatNum].loudness_max;
+  const curBeatLoudness = audioAnalysis.segments[beatNum].loudness_max;
 
-  const brightness = Math.round(Math.abs((currBeatLoudness/prevBeatLoudness)*100));
+  const brightness = Math.round(Math.abs((curBeatLoudness/prevBeatLoudness)*100));
   return _.clamp(brightness, 0, 100);
 }
