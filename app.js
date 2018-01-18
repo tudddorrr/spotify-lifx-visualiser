@@ -126,7 +126,7 @@ app.get('/user', function(req, res) {
     return;
   }
 
-  if(lightService.getLight()) {
+  if(lightService.getLights()) {
     res.redirect('/go');
     return;
   }
@@ -137,12 +137,10 @@ app.get('/user', function(req, res) {
 });
 
 app.get('/go', function(req, res) {
-  if(!user || !lightService.getLight()) {
+  if(!user || !lightService.getLights()) {
     res.redirect('/');
     return;
   }
-
-  lightService.getLight().on();  
 
   res.render('ready', {
     user: user

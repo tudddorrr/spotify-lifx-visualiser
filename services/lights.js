@@ -10,8 +10,6 @@ const BEAT_MODE = 1;
 const COLOUR_MODE = 0;
 
 var client = new LifxClient();
-var light;
-var user;
 var audioAnalysis;
 
 var loudest = -99;
@@ -19,24 +17,37 @@ var quietest = 99;
 var lastBrightness = 0;
 var paused = false;
 
-client.on('light-new', function(device) {
-  console.log("Light connected!");
-  light = device;
+function getLabel(light, callback) {
+  light.getLabel(function(err, data) {
+    if(err) return callback("Null");
+    return callback(data);
+  });
+}
+
+client.on('light-new', function(light) {
+  light.on();
+  light.color(_.random(0, 360), 100, 0, 9000, 150);    
+  
+  getLabel(light, function(name) {
+    console.log(name + " connected!");    
+  });
 });
 
-client.on('light-online', function(device) {
-  console.log("Light reconnected!");  
+client.on('light-online', function(light) {
+  getLabel(light, function(name) {
+    console.log(name + " reconnected!");    
+  });
 });
 
-client.on('light-offline', function(device) {
-  console.log("Light disconnected!");  
+client.on('light-offline', function(light) { 
   beatTimer.clearTimeout();
+  console.log("A light disconnected!");    
 });
 
 client.init();
 
-module.exports.getLight = function() {
-  return light;
+module.exports.getLights = function() {
+  return client.lights().length>0;
 }
 
 var beatNum = 0;
@@ -45,13 +56,12 @@ module.exports.initBeat = function(analysis, user) {
   beatTimer = new NanoTimer();
 
   audioAnalysis = analysis;
-  light.user = user;
 
   for(var i=0; i<audioAnalysis.segments.length; i++) {
     if(audioAnalysis.segments[i].loudness_max>loudest) loudest = audioAnalysis.segments[i].loudness_max;
     if(audioAnalysis.segments[i].loudness_max<quietest) quietest = audioAnalysis.segments[i].loudness_max;
   }
-  queryCurrentTrack();
+  queryCurrentTrack(user);
 }
 
 var albumColours = [];
@@ -91,18 +101,23 @@ function handleBeat() {
 
 function setColourFromWheel(brightness) {
   curColour+=30;
-  light.color(curColour%360, 100, brightness, 9000, 150);    
+
+  client.lights().forEach(function(light) {
+    light.color(curColour%360, 100, brightness, 9000, 150);        
+  });
 }
 
 function setColourFromAlbum(brightness) {
   curColour = randColourIndex();
   const col = albumColours[curColour];
 
-  light.color(col[0], col[1], brightness, 9000, 150);   
+  client.lights().forEach(function(light) {
+    light.color(col[0], col[1], brightness, 9000, 150);            
+  });
 }
 
-function queryCurrentTrack() {
-  spotifyService.getCurrentTrack(light.user, function(err, body) {
+function queryCurrentTrack(user) {
+  spotifyService.getCurrentTrack(user, function(err, body) {
     if(err) {
       console.log(err);
     } else {
@@ -114,7 +129,7 @@ function queryCurrentTrack() {
       }
     }
 
-    setTimeout(() => queryCurrentTrack(), MUSIC_POLL_TIME);
+    setTimeout(() => queryCurrentTrack(user), MUSIC_POLL_TIME);
   });
 }
 
