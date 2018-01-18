@@ -24,6 +24,10 @@ client.on('light-new', function(device) {
   light = device;
 });
 
+client.on('light-online', function(device) {
+  console.log("Light reconnected!");  
+});
+
 client.on('light-offline', function(device) {
   console.log("Light disconnected!");  
   beatTimer.clearTimeout();
