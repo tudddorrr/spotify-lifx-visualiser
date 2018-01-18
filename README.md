@@ -1,5 +1,5 @@
 # Spotify LIFX Visualiser
-Visualise your Spotify music through your LIFX bulb. Currently only supports one-device setups (and isn't perfect!)
+Visualise your Spotify music through your LIFX bulb. Currently untested on multiple-device setups (and isn't perfect!)
 
 ## Setup
 Clone the repository, [register a Spotify app](https://developer.spotify.com), create a .env file with the following:
