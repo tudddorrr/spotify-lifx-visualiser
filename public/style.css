@@ -37,3 +37,17 @@ a:hover {
   border-radius: 10vh;    
   box-shadow: 0px 4px 4px rgba(0,0,0,0.2);        
 }
+
+.party {
+  animation: party-anim 2s infinite ease-out;
+}
+
+@keyframes party-anim {
+  0%   {background: hsl(0, 80%, 50%)}
+  20%  {background: hsl(30, 100%, 60%);}
+  40%  {background: hsl(120, 80%, 50%);}
+  60%  {background: hsl(180, 80%, 50%);}
+  70%  {background: hsl(220, 80%, 50%);}
+  80%  {background: hsl(300, 80%, 50%);}
+  100%  {background: hsl(360, 80%, 50%);}
+}
