@@ -22,7 +22,7 @@ module.exports.getCurrentTrack = function(user, callback) {
     if(track!==body.item.id) {
       console.log("New track: " + body.item.name + " by " + body.item.artists[0].name);
       track = body.item.id;
-      self.getAudioAnalysis(null, body, user);
+      self.getAudioAnalysis(null, body, user, body.item.name);
       self.getAlbumColours(body, user);
     } else {
       if(callback) callback(null, body, user);      
@@ -30,7 +30,7 @@ module.exports.getCurrentTrack = function(user, callback) {
   });
 }
 
-module.exports.getAudioAnalysis = function(err, body, user) {
+module.exports.getAudioAnalysis = function(err, body, user, trackName) {
   if(err) {
     console.log(err);
     return;
@@ -43,7 +43,7 @@ module.exports.getAudioAnalysis = function(err, body, user) {
   };
 
   request.get(options, function(err, response, body) {
-    lightService.initBeat(body, user);
+    lightService.initBeat(body, user, trackName);
   });
 }
 

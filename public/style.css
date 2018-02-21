@@ -2,8 +2,8 @@
 
 body {
   margin: 0;
-  background: #1DB954;
-  color: white;
+  background: #191414;
+  color: #fff;
   font-family: 'Nunito', sans-serif;
 
   display: flex;
@@ -13,9 +13,9 @@ body {
 }
 
 a {
-  background: white;
+  background: #1DB954;
   padding: 1em;
-  color: #191414;
+  color: #fff;
   text-decoration: none;  
   border-radius: 2em;
   transition: 0.2s all;  
@@ -23,8 +23,7 @@ a {
 }
 
 a:hover {
-  background: #191414;
-  color: white;
+  background: #21d25f;
 }
 
 #container {
@@ -32,7 +31,6 @@ a:hover {
 }
 
 .media > img {
-  border: 0.2em solid white;
   width: 20vh;
   border-radius: 10vh;    
   box-shadow: 0px 4px 4px rgba(0,0,0,0.2);        

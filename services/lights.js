@@ -2,20 +2,29 @@ const LifxClient = require('node-lifx').Client;
 const _ = require('lodash');
 const spotifyService = require('./spotify');
 const NanoTimer = require('nanotimer');
+const fs = require('fs');
 
 const MUSIC_POLL_TIME = 2000;
 // 0 = based on section volume, 1 = based on previous beat volume
 const BEAT_MODE = 1;
 // 0 = scroll through colour wheel, 1 = based on album's artwork
 const COLOUR_MODE = 0;
+// write audio analysis to a file
+const WRITE_ANALYSIS = false;
+
+const lerp = 150;
+const colourThreshold = 30;
+const brightnessThreshold = 50;
 
 var client = new LifxClient();
 var audioAnalysis;
 
 var loudest = -99;
 var quietest = 99;
-var lastBrightness = 0;
 var paused = false;
+
+var curColour = 0;
+var lastBrightness = 0;
 
 function getLabel(light, callback) {
   light.getLabel(function(err, data) {
@@ -25,8 +34,8 @@ function getLabel(light, callback) {
 }
 
 client.on('light-new', function(light) {
-  light.on();
-  light.color(_.random(0, 360), 100, 0, 9000, 150);    
+  // light.on();
+  // light.color(0, 100, 0, 9000, lerp);    
   
   getLabel(light, function(name) {
     console.log(name + " connected!");    
@@ -52,10 +61,11 @@ module.exports.getLights = function() {
 
 var beatNum = 0;
 var beatTimer;
-module.exports.initBeat = function(analysis, user) {
+module.exports.initBeat = function(analysis, user, trackName) {
   beatTimer = new NanoTimer();
 
   audioAnalysis = analysis;
+  if(WRITE_ANALYSIS) writeAnalysis(analysis, trackName);
 
   for(var i=0; i<audioAnalysis.segments.length; i++) {
     if(audioAnalysis.segments[i].loudness_max>loudest) loudest = audioAnalysis.segments[i].loudness_max;
@@ -64,8 +74,14 @@ module.exports.initBeat = function(analysis, user) {
   queryCurrentTrack(user);
 }
 
+function writeAnalysis(analysis, trackName) {
+  var file = __dirname + '/../analysis/' + trackName + '.json';
+  fs.writeFile(file, JSON.stringify(analysis), function(err) {
+    if(err) console.log(err);
+  }); 
+}
+
 var albumColours = [];
-var curColour = 0;
 module.exports.setAlbumColours = function(colours) {
   albumColours = colours;
   curColour = randColourIndex();
@@ -85,14 +101,14 @@ function handleBeat() {
   var brightness = getBrightness();
 
   const brightnessDiff = Math.abs(brightness-lastBrightness);
-  if(brightnessDiff>=30) {
-    lastBrightness = brightness; 
-
+  if(brightnessDiff>=brightnessThreshold) {
     if(COLOUR_MODE===1) {
       setColourFromAlbum(brightness)
     } else {
       setColourFromWheel(brightness);  
     }  
+
+    lastBrightness = brightness;         
   }
 
   beatNum++;
@@ -100,10 +116,10 @@ function handleBeat() {
 }
 
 function setColourFromWheel(brightness) {
-  curColour+=30;
+  curColour+=50;
 
-  client.lights().forEach(function(light) {
-    light.color(curColour%360, 100, brightness, 9000, 150);        
+  client.lights('on').forEach(function(light) {
+    light.color(curColour%360, 100, brightness, 9000, lerp);        
   });
 }
 
@@ -111,8 +127,8 @@ function setColourFromAlbum(brightness) {
   curColour = randColourIndex();
   const col = albumColours[curColour];
 
-  client.lights().forEach(function(light) {
-    light.color(col[0], col[1], brightness, 9000, 150);            
+  client.lights('on').forEach(function(light) {
+    light.color(col[0], col[1], brightness, 9000, lerp);            
   });
 }
 
@@ -173,9 +189,14 @@ function getBrightnessPrevBeat() {
   // set brightness based on the % difference between the current and previous beats' volumes
   if(beatNum==0) return 100;
 
-  const prevBeatLoudness = audioAnalysis.segments[beatNum-1].loudness_max;
-  const curBeatLoudness = audioAnalysis.segments[beatNum].loudness_max;
+  const prevBeat = audioAnalysis.segments[beatNum-1];
+  const curBeat = audioAnalysis.segments[beatNum];
 
-  const brightness = Math.round(Math.abs((curBeatLoudness/prevBeatLoudness)*100));
+  if(curBeat.start - prevBeat.start < lerp/2000) return lastBrightness;
+
+  const prevBeatLoudness = prevBeat.loudness_max;
+  const curBeatLoudness = curBeat.loudness_max;
+
+  const brightness = Math.floor(Math.abs((curBeatLoudness/prevBeatLoudness)*100));
   return _.clamp(brightness, 0, 100);
 }

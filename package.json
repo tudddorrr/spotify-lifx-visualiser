@@ -4,7 +4,7 @@
   "description": "LIFX visualiser for Spotify music",
   "version": "1.0.0",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js --ignore 'analysis/*.json'"
   },
   "dependencies": {
     "color-convert": "^1.9.1",
