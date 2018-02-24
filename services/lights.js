@@ -3,14 +3,17 @@ const _ = require('lodash');
 const spotifyService = require('./spotify');
 const NanoTimer = require('nanotimer');
 const fs = require('fs');
+const argv = require('minimist')(process.argv.slice(2));
 
 const MUSIC_POLL_TIME = 2000;
 // 0 = based on section volume, 1 = based on previous beat volume
-const BEAT_MODE = 1;
-// 0 = scroll through colour wheel, 1 = based on album's artwork
-const COLOUR_MODE = 0;
+const BEAT_MODE = argv.b || argv.beatmode || 1;
+// 0 = scroll through colour wheel, 1 = based on album's artwork, 2 = current colour + hue, 3 = purely current colour
+const COLOUR_MODE = argv.c || argv.colourmode || 3;
 // write audio analysis to a file
-const WRITE_ANALYSIS = false;
+const WRITE_ANALYSIS = argv.w || argv.writeanalysis || false;
+// max brightness
+const MAX_BRIGHTNESS = argv.m || argv.maxbrightness || 100;
 
 const lerp = 150;
 const colourThreshold = 30;
@@ -24,6 +27,8 @@ var quietest = 99;
 var paused = false;
 
 var curColour = 0;
+var curSat = 0;
+var initialSat = -1;
 var lastBrightness = 0;
 
 function getLabel(light, callback) {
@@ -102,11 +107,19 @@ function handleBeat() {
 
   const brightnessDiff = Math.abs(brightness-lastBrightness);
   if(brightnessDiff>=brightnessThreshold) {
-    if(COLOUR_MODE===1) {
-      setColourFromAlbum(brightness)
-    } else {
-      setColourFromWheel(brightness);  
-    }  
+    switch(COLOUR_MODE) {
+      case 0:
+        setColourFromWheel(brightness);  
+        break;
+      case 1:
+        setColourFromAlbum(brightness)
+        break;
+      case 2: 
+        setColourFromBrightness(brightness);
+        break;
+      case 3:
+        setColourFromBrightnessPure(brightness);      
+    }
 
     lastBrightness = brightness;         
   }
@@ -129,6 +142,40 @@ function setColourFromAlbum(brightness) {
 
   client.lights('on').forEach(function(light) {
     light.color(col[0], col[1], brightness, 9000, lerp);            
+  });
+}
+
+function setColourFromBrightness(brightness) {
+  if(initialSat!==-1) {
+    const prevSat = curSat;
+    while(prevSat===curSat) setRandSat();
+  }
+
+  client.lights('on').forEach(function(light) {
+    light.getState(function(err, data) {
+      if(data) {
+        if(initialSat===-1 && data.color.saturation) {
+          initialSat = data.color.saturation;
+          curSat = initialSat;
+        }
+        light.color(data.color.hue, curSat, brightness, data.color.kelvin, lerp); 
+      }           
+    });
+  });
+}
+
+function setRandSat() {
+  curSat = _.random(initialSat-50, initialSat+50);   
+  curSat = _.clamp(curSat, initialSat/2, 100);
+}
+
+function setColourFromBrightnessPure(brightness) {
+  client.lights('on').forEach(function(light) {
+    light.getState(function(err, data) {
+      if(data) {
+        light.color(data.color.hue, data.color.saturation, brightness, data.color.kelvin, lerp); 
+      }           
+    });
   });
 }
 
