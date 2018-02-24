@@ -8,7 +8,7 @@ const argv = require('minimist')(process.argv.slice(2));
 const MUSIC_POLL_TIME = 2000;
 // 0 = based on section volume, 1 = based on previous beat volume
 const BEAT_MODE = argv.b || argv.beatmode || 1;
-// 0 = scroll through colour wheel, 1 = based on album's artwork, 2 = current colour + hue, 3 = purely current colour
+// 0 = scroll through colour wheel, 1 = based on album's artwork, 2 = current colour + saturation shifts, 3 = purely current colour
 const COLOUR_MODE = argv.c || argv.colourmode || 3;
 // write audio analysis to a file
 const WRITE_ANALYSIS = argv.w || argv.writeanalysis || false;
