@@ -23,28 +23,28 @@ A browser window will open asking you to authorize your Spotify account
 
 ``` 
 Modes: 
-0: Based on the loudness of the track's current section
-1: Based on the difference in loudness from the previous beat to the current beat
+1: Based on the loudness of the track's current section
+2: Based on the difference in loudness from the previous beat to the current beat
 ```
 
 ```-c [mode] or --colourmode [mode]```
 
 ```
 Modes:
-0: Cycles through the colour wheel
-1: Based off the album artwork's colours
-2: Based on the existing colour of the light with slight saturation shifts for variety
-3: Purely based on the existing colour of the light
+1: Cycles through the colour wheel
+2: Based off the album artwork's colours
+3: Based on the existing colour of the light with slight saturation shifts for variety
+4: Purely based on the existing colour of the light
 ```
 
 ```-w or --writeanalysis``` writes the Spotify song analysis data to a file
 
-```-l [lightnames] or --lights [lightnames]``` choose which lights get used separated by commas e.g. ```--lights 'Bedroom Lights, Upstairs, Downstairs'``` (**TODO**)
+```-l [lightnames] or --lights [lightnames]``` choose which lights get used separated by commas e.g. ```--lights 'Bedroom, Upstairs, Downstairs'``` (not specifying this will just assume you want to use all your lights)
 
 ```-m [brightness] or --maxbrightness [brightness]``` sets the maximum brightness of the light (**TODO**)
 
 ### Example
-```node app.js -b 1 -c 0 -w``` will start the app in beat mode 0, colour mode 1 and will write song analysis data to a file
+```node app.js --beatmode 2 --colourmode 1 --writeanalysis --lights 'Bedroom, Upstairs'``` will start the app in beat mode 2, colour mode 1, will write song analysis data to a file and will use the Bedroom and Upstairs lights
 
 ## Warning
 Depending on the music you use it may be possible to cause seizures. Be careful!

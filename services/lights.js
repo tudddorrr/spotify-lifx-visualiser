@@ -6,20 +6,22 @@ const fs = require('fs');
 const argv = require('minimist')(process.argv.slice(2));
 
 const MUSIC_POLL_TIME = 2000;
-// 0 = based on section volume, 1 = based on previous beat volume
+// 1 = based on section volume, 2 = based on previous beat volume
 const BEAT_MODE = argv.b || argv.beatmode || 1;
-// 0 = scroll through colour wheel, 1 = based on album's artwork, 2 = current colour + saturation shifts, 3 = purely current colour
+// 1 = scroll through colour wheel, 2 = based on album's artwork, 3 = current colour + saturation shifts, 4 = purely current colour
 const COLOUR_MODE = argv.c || argv.colourmode || 3;
 // write audio analysis to a file
 const WRITE_ANALYSIS = argv.w || argv.writeanalysis || false;
 // max brightness
 const MAX_BRIGHTNESS = argv.m || argv.maxbrightness || 100;
+const LIGHTS_TO_USE = argv.l ? argv.l.toLowerCase().split(', ') : argv.lights ? argv.lights.toLowerCase().split(', ') : [];
 
 const lerp = 150;
 const colourThreshold = 30;
 const brightnessThreshold = 50;
 
 var client = new LifxClient();
+var lights = [];
 var audioAnalysis;
 
 var loudest = -99;
@@ -38,24 +40,25 @@ function getLabel(light, callback) {
   });
 }
 
-client.on('light-new', function(light) {
-  // light.on();
-  // light.color(0, 100, 0, 9000, lerp);    
-  
+client.on('light-new', function(light) {  
   getLabel(light, function(name) {
-    console.log(name + " connected!");    
+    console.log(name + " found"); 
+    if(LIGHTS_TO_USE.length===0 || LIGHTS_TO_USE.indexOf(name.toLowerCase())!==-1) {  
+      lights.push(light); 
+      console.log(name + " connected!");          
+    }
   });
 });
 
 client.on('light-online', function(light) {
   getLabel(light, function(name) {
-    console.log(name + " reconnected!");    
+    console.log(name + " reconnected");     
   });
 });
 
 client.on('light-offline', function(light) { 
   beatTimer.clearTimeout();
-  console.log("A light disconnected!");    
+  console.log("A light disconnected");    
 });
 
 client.init();
@@ -108,16 +111,16 @@ function handleBeat() {
   const brightnessDiff = Math.abs(brightness-lastBrightness);
   if(brightnessDiff>=brightnessThreshold) {
     switch(COLOUR_MODE) {
-      case 0:
+      case 1:
         setColourFromWheel(brightness);  
         break;
-      case 1:
+      case 2:
         setColourFromAlbum(brightness)
         break;
-      case 2: 
+      case 3: 
         setColourFromBrightness(brightness);
         break;
-      case 3:
+      case 4:
         setColourFromBrightnessPure(brightness);      
     }
 
@@ -131,7 +134,7 @@ function handleBeat() {
 function setColourFromWheel(brightness) {
   curColour+=50;
 
-  client.lights('on').forEach(function(light) {
+  lights.forEach(function(light) {
     light.color(curColour%360, 100, brightness, 9000, lerp);        
   });
 }
@@ -140,7 +143,7 @@ function setColourFromAlbum(brightness) {
   curColour = randColourIndex();
   const col = albumColours[curColour];
 
-  client.lights('on').forEach(function(light) {
+  lights.forEach(function(light) {
     light.color(col[0], col[1], brightness, 9000, lerp);            
   });
 }
@@ -151,7 +154,7 @@ function setColourFromBrightness(brightness) {
     while(prevSat===curSat) setRandSat();
   }
 
-  client.lights('on').forEach(function(light) {
+  lights.forEach(function(light) {
     light.getState(function(err, data) {
       if(data) {
         if(initialSat===-1 && data.color.saturation) {
@@ -170,7 +173,7 @@ function setRandSat() {
 }
 
 function setColourFromBrightnessPure(brightness) {
-  client.lights('on').forEach(function(light) {
+  lights.forEach(function(light) {
     light.getState(function(err, data) {
       if(data) {
         light.color(data.color.hue, data.color.saturation, brightness, data.color.kelvin, lerp); 
@@ -218,7 +221,7 @@ function getSection() {
 }
 
 function getBrightness() {
-  return BEAT_MODE==0 ? getBrightnessSectionLoudness() : getBrightnessPrevBeat();
+  return BEAT_MODE==1 ? getBrightnessSectionLoudness() : getBrightnessPrevBeat();
 }
 
 function getBrightnessSectionLoudness() {
