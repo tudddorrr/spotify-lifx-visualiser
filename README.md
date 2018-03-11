@@ -7,9 +7,13 @@ Clone the repository, [register a Spotify app](https://developer.spotify.com), c
 ```
 CLIENT_ID=yourclientid
 CLIENT_SECRET=yourclientsecret
-REDIRECT_URI=yourcallbackurl
+REDIRECT_URI=yourredirecturi
 PORT=anyport
 ```
+
+You can create a redirect URI by clicking "Edit settings" on the [Spotify developer site](https://developer.spotify.com). Make sure port of the redirect URI and the port the app runs on are the same (e.g. 8888)
+
+<img src="https://i.imgur.com/u3rQeyc.png" width="600">
 
 Finally, run ```npm install```
 
