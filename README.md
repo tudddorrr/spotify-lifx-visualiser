@@ -2,7 +2,7 @@
 Visualise your Spotify music through your LIFX bulb!
 
 ## Setup
-Clone the repository, [register a Spotify app](https://developer.spotify.com), a file called ".env" with the following:
+Clone the repository, [register a Spotify app](https://developer.spotify.com) and create a file called ".env" with the following:
 
 ```
 CLIENT_ID=yourclientid
