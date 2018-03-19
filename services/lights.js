@@ -14,11 +14,13 @@ const COLOUR_MODE = argv.c || argv.colourmode || 3;
 const WRITE_ANALYSIS = argv.w || argv.writeanalysis || false;
 // max brightness
 const MAX_BRIGHTNESS = argv.m || argv.maxbrightness || 100;
+// lights to use
 const LIGHTS_TO_USE = argv.l ? argv.l.toLowerCase().split(', ') : argv.lights ? argv.lights.toLowerCase().split(', ') : [];
+// threshold that needs to be exceeded for a "new" beat
+const BEAT_THRESHOLD = argv.t || argv.threshold || 40;
 
 const lerp = 150;
 const colourThreshold = 30;
-const brightnessThreshold = 50;
 
 var client = new LifxClient();
 var lights = [];
@@ -109,7 +111,7 @@ function handleBeat() {
   var brightness = getBrightness();
 
   const brightnessDiff = Math.abs(brightness-lastBrightness);
-  if(brightnessDiff>=brightnessThreshold) {
+  if(brightnessDiff>=BEAT_THRESHOLD) {
     switch(COLOUR_MODE) {
       case 1:
         setColourFromWheel(brightness);  

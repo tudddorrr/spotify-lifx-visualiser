@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "nodemon app.js",
-    "go": "nodemon app.js -l 'bedroom light' --ignore 'analysis/*.json'"
+    "go": "nodemon app.js -l 'bedroom light' -t 45 --ignore 'analysis/*.json'"
   },
   "dependencies": {
     "color-convert": "^1.9.1",

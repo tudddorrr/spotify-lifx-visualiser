@@ -45,6 +45,8 @@ Modes:
 
 ```-l [lightnames] or --lights [lightnames]``` choose which lights get used separated by commas e.g. ```--lights 'Bedroom, Upstairs, Downstairs'``` (not specifying this will just assume you want to use all your lights)
 
+```-t or --threshold``` number between 0 and 100 controlling what is deemed as a new beat (to change colour) (0 = all beats are new, 100 = barely any beats are new)
+
 ```-m [brightness] or --maxbrightness [brightness]``` sets the maximum brightness of the light (**TODO**)
 
 ### Example
