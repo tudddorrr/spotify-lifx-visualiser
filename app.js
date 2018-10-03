@@ -84,6 +84,7 @@ app.get('/callback', function(req, res) {
             return;
           }
           user = body;
+          console.log(body)
           user.access_token = access_token;
           res.redirect('/user');
         });

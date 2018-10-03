@@ -50,7 +50,7 @@ Modes:
 ```-m [brightness] or --maxbrightness [brightness]``` sets the maximum brightness of the light (**TODO**)
 
 ### Example
-```node app.js --beatmode 2 --colourmode 1 --writeanalysis --lights 'Bedroom, Upstairs'``` will start the app in beat mode 2, colour mode 1, will write song analysis data to a file and will use the Bedroom and Upstairs lights
+```npm start -- --beatmode 2 --colourmode 1 --writeanalysis --lights 'Bedroom, Upstairs'``` will start the app in beat mode 2, colour mode 1, will write song analysis data to a file and will use the Bedroom and Upstairs lights
 
 ## Warning
 Depending on the music you use it may be possible to cause seizures. Be careful!
