@@ -11,7 +11,7 @@ REDIRECT_URI=yourredirecturi
 PORT=anyport
 ```
 
-You can create a redirect URI by clicking "Edit settings" on the [Spotify developer site](https://developer.spotify.com). Make sure port of the redirect URI and the port the app runs on are the same (e.g. 8888)
+You can create a redirect URI by clicking "Edit settings" on the [Spotify developer site](https://developer.spotify.com). Make sure the port of the redirect URI and the port the app runs on are the same (e.g. 8888)
 
 <img src="https://i.imgur.com/u3rQeyc.png" width="700">
 
@@ -28,7 +28,7 @@ A browser window will open asking you to authorize your Spotify account
 ``` 
 Modes: 
 1: Based on the loudness of the track's current section
-2: Based on the difference in loudness from the previous beat to the current beat
+2: Based on the difference in loudness from the previous beat to the current beat (recommended)
 ```
 
 ```-c [mode] or --colourmode [mode]```
@@ -45,9 +45,7 @@ Modes:
 
 ```-l [lightnames] or --lights [lightnames]``` choose which lights get used separated by commas e.g. ```--lights 'Bedroom, Upstairs, Downstairs'``` (not specifying this will just assume you want to use all your lights)
 
-```-t or --threshold``` number between 0 and 100 controlling what is deemed as a new beat (to change colour) (0 = all beats are new, 100 = barely any beats are new)
-
-```-m [brightness] or --maxbrightness [brightness]``` sets the maximum brightness of the light (**TODO**)
+```-t or --threshold``` number between 0 and 100 controlling what is deemed as a new beat (to change colour) (0 = all beats are new, 100 = barely any beats are new). Recommended is about 30-45.
 
 ### Example
 ```npm start -- --beatmode 2 --colourmode 1 --writeanalysis --lights 'Bedroom, Upstairs'``` will start the app in beat mode 2, colour mode 1, will write song analysis data to a file and will use the Bedroom and Upstairs lights
