@@ -72,7 +72,10 @@ module.exports.getLights = function() {
 var beatNum = 0;
 var beatTimer;
 module.exports.initBeat = function(analysis, user, trackName) {
-  if(!audioAnalysis || !audioAnalysis.segments) queryCurrentTrack(user);
+  if(!audioAnalysis || !audioAnalysis.segments) {
+    queryCurrentTrack(user);
+    return;
+  }
 
   beatTimer = new NanoTimer();
 
