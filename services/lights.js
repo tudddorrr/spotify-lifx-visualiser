@@ -22,7 +22,6 @@ const BEAT_THRESHOLD = argv.t || argv.threshold || 40;
 const MIN_SATURATION = argv.s || argv.minsaturation || 0;
 
 const lerp = 150;
-const colourThreshold = 30;
 
 var client = new LifxClient();
 var lights = [];
