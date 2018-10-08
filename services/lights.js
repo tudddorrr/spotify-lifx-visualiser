@@ -18,6 +18,8 @@ const MAX_BRIGHTNESS = argv.m || argv.maxbrightness || 100;
 const LIGHTS_TO_USE = argv.l ? argv.l.toLowerCase().split(', ') : argv.lights ? argv.lights.toLowerCase().split(', ') : [];
 // threshold that needs to be exceeded for a "new" beat
 const BEAT_THRESHOLD = argv.t || argv.threshold || 40;
+// minimum saturation of the color
+const MIN_SATURATION = argv.s || argv.minsaturation || 0;
 
 const lerp = 150;
 const colourThreshold = 30;
@@ -114,9 +116,10 @@ function handleBeat() {
   if(beatNum>=audioAnalysis.segments.length || paused) return;
 
   var brightness = getBrightness();
+  brightness = brightness * MAX_BRIGHTNESS / 100;
 
   const brightnessDiff = Math.abs(brightness-lastBrightness);
-  if(brightnessDiff>=BEAT_THRESHOLD) {
+  if(brightnessDiff>=BEAT_THRESHOLD * MAX_BRIGHTNESS / 100) {
     switch(COLOUR_MODE) {
       case 1:
         setColourFromWheel(brightness);  
@@ -168,6 +171,7 @@ function setColourFromBrightness(brightness) {
           initialSat = data.color.saturation;
           curSat = initialSat;
         }
+        curSat = (1- (MIN_SATURATION / 100)) * curSat + MIN_SATURATION;
         light.color(data.color.hue, curSat, brightness, data.color.kelvin, lerp); 
       }           
     });
