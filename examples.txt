@@ -1,0 +1,8 @@
+# Chill
+npm start -- --beatmode 1 --colourmode 3 --maxbrightness 45 --minbrightness 40 --minsaturation 80 --threshold 60 --colourrange 6 --defaultcolour tamisepose
+
+# EDM
+npm start -- --beatmode 1 --colourmode 3 --maxbrightness 50 --minbrightness 0 --minsaturation 88 --threshold 5 --colourrange 90 --defaultcolour red
+
+# Inter
+npm start -- --beatmode 1 --colourmode 3 --maxbrightness 45 --minbrightness 20 --minsaturation 80 --threshold 20 --colourrange 20 --defaultcolour blue
