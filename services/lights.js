@@ -14,12 +14,18 @@ const COLOUR_MODE = argv.c || argv.colourmode || 3;
 const WRITE_ANALYSIS = argv.w || argv.writeanalysis || false;
 // max brightness
 const MAX_BRIGHTNESS = argv.m || argv.maxbrightness || 100;
+// min brightness
+const MIN_BRIGHTNESS = argv.minbrightness || 0;
 // lights to use
 const LIGHTS_TO_USE = argv.l ? argv.l.toLowerCase().split(', ') : argv.lights ? argv.lights.toLowerCase().split(', ') : [];
 // threshold that needs to be exceeded for a "new" beat
 const BEAT_THRESHOLD = argv.t || argv.threshold || 40;
 // minimum saturation of the color
 const MIN_SATURATION = argv.s || argv.minsaturation || 0;
+// range of the colors used (in degrees). 
+const COLOUR_RANGE = argv.r || argv.colourrange || 0;
+// default color
+const DEFAULT_COLOUR = argv.d || argv.defaultcolour || '';
 
 const lerp = 150;
 const colourThreshold = 30;
@@ -36,6 +42,35 @@ var curColour = 0;
 var curSat = 0;
 var initialSat = -1;
 var lastBrightness = 0;
+
+switch(DEFAULT_COLOUR) {
+  case 'red':
+    var initialColor = 0;
+    break;
+  case 'tamisepose':
+    var initialColor = 45;
+    break;    
+  case 'yellow':
+    var initialColor = 60;
+    break;
+  case 'green':
+    var initialColor = 120;
+    break;
+  case 'cyan':
+    var initialColor = 180;
+    break;    
+  case 'blue': 
+    var initialColor = 240;
+    break;
+  case 'purple':
+    var initialColor = 300;
+    break;
+  case 'pink':
+    var initialColor = 330;
+    break;    
+  default:
+    var initialColor = -1;
+}
 
 function getLabel(light, callback) {
   light.getLabel(function(err, data) {
@@ -116,10 +151,10 @@ function handleBeat() {
   if(beatNum>=audioAnalysis.segments.length || paused) return;
 
   var brightness = getBrightness();
-  brightness = brightness * MAX_BRIGHTNESS / 100;
+  brightness = MIN_BRIGHTNESS + brightness * (MAX_BRIGHTNESS - MIN_BRIGHTNESS) / 100;
 
   const brightnessDiff = Math.abs(brightness-lastBrightness);
-  if(brightnessDiff>=BEAT_THRESHOLD * MAX_BRIGHTNESS / 100) {
+  if(brightnessDiff>=BEAT_THRESHOLD * (MAX_BRIGHTNESS - MIN_BRIGHTNESS) / 100) {
     switch(COLOUR_MODE) {
       case 1:
         setColourFromWheel(brightness);  
@@ -172,7 +207,11 @@ function setColourFromBrightness(brightness) {
           curSat = initialSat;
         }
         curSat = (1- (MIN_SATURATION / 100)) * curSat + MIN_SATURATION;
-        light.color(data.color.hue, curSat, brightness, data.color.kelvin, lerp); 
+
+        if(initialColor===-1) initialColor = data.color.hue;
+
+        epsilon = _.random(-COLOUR_RANGE / 2, COLOUR_RANGE / 2) + 360;
+        light.color((initialColor+epsilon)%360 , curSat, brightness, data.color.kelvin, lerp); 
       }           
     });
   });
