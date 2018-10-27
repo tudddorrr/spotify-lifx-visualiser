@@ -11,6 +11,7 @@ const stateKey = 'spotify_auth_state';
 const lightService = require('./services/lights');
 const spotifyService = require('./services/spotify');
 
+
 function generateRandomString() {
   var text = '';
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
