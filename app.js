@@ -12,6 +12,7 @@ const lightService = require('./services/lights');
 const spotifyService = require('./services/spotify');
 const redirect_uri = 'http://' + process.env.IP + ':' + process.env.PORT +'/callback/'
 
+
 function generateRandomString() {
   var text = '';
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -127,7 +128,6 @@ app.get('/user', function(req, res) {
     res.redirect('/');
     return;
   }
-
   if(lightService.getLights()) {
     res.redirect('/go');
     return;
@@ -139,6 +139,44 @@ app.get('/user', function(req, res) {
 });
 
 app.get('/go', function(req, res) {
+  if(!user || !lightService.getLights()) {
+    res.redirect('/');
+    return;
+  }
+
+  res.render('ready', {
+    user: user
+  });
+
+  spotifyService.getCurrentTrack(user);    
+});
+
+app.get('/go/colour/:chosenColor', function(req, res) {
+  var colour = req.params.chosenColor;
+
+  var lights = require('./services/lights');
+  console.log('Changing color to ' + colour);
+  lights.setInitialColor(colour);
+
+  if(!user || !lightService.getLights()) {
+    res.redirect('/');
+    return;
+  }
+
+  res.render('ready', {
+    user: user
+  });
+
+  spotifyService.getCurrentTrack(user);    
+});
+
+app.get('/go/mode/:chosenMode', function(req, res) {
+  var mode = req.params.chosenMode;
+
+  var lights = require('./services/lights');
+  console.log('Changing mode to ' + mode);
+  lights.setMode(mode);
+
   if(!user || !lightService.getLights()) {
     res.redirect('/');
     return;
