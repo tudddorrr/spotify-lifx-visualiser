@@ -210,7 +210,11 @@ function queryCurrentTrack(user) {
 }
 
 function updateBeatNum(progress) {
-  var prev = beatNum;
+  if(!audioAnalysis || !audioAnalysis.segments) {
+    beatTimer.clearTimeout();
+    return;
+  }
+
   for(var i=0; i<audioAnalysis.segments.length; i++) {
     const start = audioAnalysis.segments[i].start;
     const end = start+audioAnalysis.segments[i].duration;
