@@ -18,7 +18,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.16.0",
     "lodash": "^4.17.13",
-    "minimist": "^1.2.2",
+    "minimist": "^1.2.3",
     "nanotimer": "^0.3.15",
     "node-lifx": "^0.8.0",
     "node-vibrant": "^3.0.0",
