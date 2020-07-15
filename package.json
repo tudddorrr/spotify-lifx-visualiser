@@ -17,7 +17,7 @@
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
     "express": "^4.16.0",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "minimist": "^1.2.3",
     "nanotimer": "^0.3.15",
     "node-lifx": "^0.8.0",
