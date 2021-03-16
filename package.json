@@ -23,7 +23,7 @@
     "node-lifx": "^0.8.0",
     "node-vibrant": "^3.0.0",
     "opn": "^5.1.0",
-    "pug": "^2.0.3",
+    "pug": "^3.0.1",
     "querystring": "~0.2.0",
     "request": "^2.88.0"
   },
