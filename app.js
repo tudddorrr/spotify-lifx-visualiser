@@ -10,7 +10,6 @@ var user;
 const stateKey = 'spotify_auth_state';
 const lightService = require('./services/lights');
 const spotifyService = require('./services/spotify');
-const redirect_uri = 'http://' + process.env.IP + ':' + process.env.PORT +'/callback/'
 
 
 function generateRandomString() {
@@ -36,7 +35,7 @@ app.get('/login', function(req, res) {
       response_type: 'code',
       client_id: process.env.CLIENT_ID,
       scope: scope,
-      redirect_uri: redirect_uri, // process.env.REDIRECT_URI,
+      redirect_uri: process.env.REDIRECT_URI,
       state: state
     }));
 });
@@ -57,7 +56,7 @@ app.get('/callback', function(req, res) {
       url: 'https://accounts.spotify.com/api/token',
       form: {
         code: code,
-        redirect_uri: redirect_uri,
+        redirect_uri: process.env.REDIRECT_URI,
         grant_type: 'authorization_code'
       },
       headers: {
