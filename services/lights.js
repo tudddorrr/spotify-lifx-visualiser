@@ -28,7 +28,6 @@ var COLOUR_RANGE = argv.r || argv.colourrange || 0;
 var DEFAULT_COLOUR = argv.d || argv.defaultcolour || '';
 
 const lerp = 150;
-const colourThreshold = 30;
 
 var client = new LifxClient();
 var lights = [];
@@ -152,12 +151,12 @@ module.exports.getLights = function() {
 var beatNum = 0;
 var beatTimer;
 module.exports.initBeat = function(analysis, user, trackName) {
+  beatTimer = new NanoTimer();
+
   if(!analysis || !analysis.segments) {
     queryCurrentTrack(user);
     return;
   }
-
-  beatTimer = new NanoTimer();
 
   audioAnalysis = analysis;
   if(WRITE_ANALYSIS) writeAnalysis(analysis, trackName);
@@ -293,7 +292,11 @@ function queryCurrentTrack(user) {
 }
 
 function updateBeatNum(progress) {
-  var prev = beatNum;
+  if(!audioAnalysis || !audioAnalysis.segments) {
+    beatTimer.clearTimeout();
+    return;
+  }
+
   for(var i=0; i<audioAnalysis.segments.length; i++) {
     const start = audioAnalysis.segments[i].start;
     const end = start+audioAnalysis.segments[i].duration;

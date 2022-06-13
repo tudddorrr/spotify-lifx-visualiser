@@ -47,6 +47,10 @@ Modes:
 
 ```-t or --threshold``` number between 0 and 100 controlling what is deemed as a new beat (to change colour) (0 = all beats are new, 100 = barely any beats are new). Recommended is about 30-45.
 
+```-m or --maxbrightness``` number between 0 and 100 controlling the max brightness of your lights
+
+```-s or --minsaturation``` number between 0 and 360 controlling the minimum saturation of your lights in colour mode 3
+
 ### Example
 ```npm start -- --beatmode 2 --colourmode 1 --writeanalysis --lights 'Bedroom, Upstairs'``` will start the app in beat mode 2, colour mode 1, will write song analysis data to a file and will use the Bedroom and Upstairs lights
 
