@@ -2,6 +2,7 @@ html
   head
     title= 'LIFX Visualiser'
     link(rel='stylesheet', href='/style.css')
+    link(rel="icon", href="/images/spotify-logo.png")
   body
     div(id='container')
       h1= 'Hey ' + user.display_name.split(" ")[0]
@@ -14,6 +15,6 @@ html
       h3= 'Your Spotify account is now connected!'
       h4= '...but we couldn\'t find any LIFX devices'
 
-      br
-      a(href='/user' class="btn btn-primary")='Retry'
-      
+      div
+        br
+        a(href='/user' class="btn btn-primary")='Retry'
