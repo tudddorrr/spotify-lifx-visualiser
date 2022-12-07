@@ -16,7 +16,7 @@
     "color-convert": "^1.9.1",
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
-    "express": "^4.16.0",
+    "express": "^4.17.3",
     "lodash": "^4.17.21",
     "minimist": "^1.2.3",
     "nanotimer": "^0.3.15",
